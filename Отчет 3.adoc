@@ -1,0 +1,157 @@
+:imagesdir: Dlya 3 work 
+
+== Отчет 3 
+
+==== Задание 1 
+
+Написать программу в main.cpp 
+[source,]
+----
+#include "rccregisters.hpp"   //for RCC
+int main() {
+  RCC::AHB1ENR::GPIOCEN::Enable::Set() ;
+  for(;;) {
+    //код лабораторной здесь.
+  }
+  return 0 ;
+}
+----
+
+*Программа:*
+
+* адрес  модуля GPIOC 0x4002 0800 - 0x4002 0BFF
+* смещение регистра GPIOС_ODR относительно адреса GPIOC Address offset: 0x14
+* вычислить адрес регистра GPIOC_ODR 0x00000014 *(Но не факт!!!)*
+
+[source,]
+----
+#include "rccregisters.hpp" //for RCC
+#include "gpiocregisters.hpp"
+
+*// функция задержки  цикл void Delay(). *
+
+int Delay(void)
+{
+for(int i=0; i<1000000000; i++)//
+  {
+  }
+return 0;
+}
+
+int main()
+{
+  RCC::AHB1ENR::GPIOCEN::Enable::Set();
+ for( ; ; )
+  { 
+    GPIOC::MODER::MODER5::Output::Set();
+    GPIOC::MODER::MODER8::Output::Set();
+    GPIOC::MODER::MODER9::Output::Set();
+    
+//*Запись по адресу регистра GPIOC_ODR биты 5,8,9 в 1*
+    
+    GPIOC::ODR::ODR5::Enable::Set();
+    GPIOC::ODR::ODR8::Enable::Set();
+    GPIOC::ODR::ODR9::Enable::Set();
+    
+  Delay();  
+  
+ * // Запись битов 5,8,9 в 0*
+ 
+    GPIOC::ODR::ODR5::Disable::Set();
+    GPIOC::ODR::ODR8::Disable::Set();
+    GPIOC::ODR::ODR9::Disable::Set();
+  }
+return 0;
+}
+----
+[.blue.backgorund.] 
+В регистрах GPIOС_MODER и GPIOС_ODR происходит запись соответствующих битов согласно кода
+
+== Задание 2 
+[source,]
+----
+int __low_level_init (void)
+  {
+    RCC::CR::HSEON::Enable::Set();
+    while (!RCC::CR::HSERDY::Enable::IsSet());
+    {
+    };
+    
+    RCC::CFGR::SW::Hse::Set();
+    while (!RCC::CFGR::SWS::Hse::IsSet());
+    {
+    };
+    RCC::CFGR::RTCPRE::Set(16);
+    RCC::AHB1ENR::GPIOCEN::Enable::Set(); 
+    RCC::AHB1ENR::GPIOAEN::Enable::Set(); 
+    GPIOA::MODER::MODER5::Output::Set(); 
+    GPIOC::MODER::MODER5::Output::Set(); 
+    GPIOC::MODER::MODER8::Output::Set(); 
+    GPIOC::MODER::MODER9::Output::Set(); 
+    GPIOC::MODER::MODER13::Input::Set(); 
+----
+
+[.blue.backgorund.] 
+Произвели проверку совпадения значения  регистра GPIOC_MODER со значением в переменной типа int
+
+== Задание 3
+[source,]
+----
+RCC::CFGR::SW::Hse::Set();
+    while (!RCC::CFGR::SWS::Hse::IsSet());
+    {
+    };
+    RCC::CFGR::RTCPRE::Set(16);
+    RCC::AHB1ENR::GPIOCEN::Enable::Set(); //podkluchaem porti C
+    RCC::AHB1ENR::GPIOAEN::Enable::Set(); //podkluchaem porti A
+    GPIOA::MODER::MODER5::Output::Set(); //Podkluchaem port kak vihod
+    GPIOC::MODER::MODER5::Output::Set(); //Podkluchaem port kak vihod
+    GPIOC::MODER::MODER8::Output::Set(); //Podkluchaem port kak vihod
+    GPIOC::MODER::MODER9::Output::Set(); //Podkluchaem port kak vihod
+    GPIOC::MODER::MODER13::Input::Set(); //Podkluchaem port kak vhod
+----
+== Задание 4 
+
+Сделать программу, которая при нажатии кнопки UserButton на отладочной плате меняет состояние всех 4 светодидов.
+
+[source,]
+----
+//Кнопка 
+
+int main()
+{
+bool flag = false;
+for (; ;)
+{
+
+if(GPIOC::IDR::IDR13::Off::IsSet()) //Кнопка включается
+{
+while(GPIOC::IDR::IDR13::Off::IsSet())
+{
+} ;
+
+if(flag)
+{
+GPIOA::ODR::ODR5::High::Set ();
+GPIOC::ODR::ODR5::High::Set ();
+GPIOC::ODR::ODR8::High::Set ();
+GPIOC::ODR::ODR9::High::Set ();
+flag = false ;
+}
+else
+{
+GPIOA::ODR::ODR5::Low::Set ();
+GPIOC::ODR::ODR5::Low::Set ();
+GPIOC::ODR::ODR8::Low::Set ();
+GPIOC::ODR::ODR9::Low::Set ();
+flag = true ;
+}
+}
+}
+return 0;
+}
+
+// Описание:
+Задается flag,который при нажатии IDR13 (кнопка) из 0 переходит в 1 ==> Кнопка включается после чего загараются четыре светодиода.
+При поторном нажатии происходит обратное действие flag,который при нажатии IDR13 (кнопка) из 1 переходит в 0 ==> Кнопка выключается,гаснут светодиоды.
+----
