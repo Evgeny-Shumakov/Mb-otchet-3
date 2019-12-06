@@ -1,4 +1,4 @@
-:imagesdir: Dlya 3 work 
+:imagesdir: Dlya 3 work
 
 == Отчет 3 
 
@@ -20,103 +20,134 @@ int main() {
 *Программа:*
 
 * адрес  модуля GPIOC 0x4002 0800 - 0x4002 0BFF
-* смещение регистра GPIOС_ODR относительно адреса GPIOC Address offset: 0x14
-* вычислить адрес регистра GPIOC_ODR 0x00000014 *(Но не факт!!!)*
-
+* Cмещение регистра GPIOС_MODER относительно адреса GPIOC: 0x00
+* Смещение регистра GPIOC_ODR относительно адреса GPIOC: 0x14
 [source,]
 ----
-#include "rccregisters.hpp" //for RCC
-#include "gpiocregisters.hpp"
+прописываем смещения, и ссумируем с адресом GPIOC:
 
-*// функция задержки  цикл void Delay(). *
-
-int Delay(void)
-{
-for(int i=0; i<1000000000; i++)//
-  {
-  }
-return 0;
-}
-
+constexpr size_t GpiocAddr = 0x40020800;
+constexpr size_t ModerOffset = 0x00;
+constexpr size_t OdrOffset = 0x14;
+constexpr size_t ModerAddr = GpiocAddr + ModerOffset;
+constexpr size_t OdrAddr = GpiocAddr + OdrOffset;
+----
+*Теперь в GPIOC_MODER в биты 10, 16, 18 нужно было прописать в 1, а в 11, 17, 19 в 0*
+[source,]
+----
 int main()
 {
-  RCC::AHB1ENR::GPIOCEN::Enable::Set();
- for( ; ; )
-  { 
-    GPIOC::MODER::MODER5::Output::Set();
-    GPIOC::MODER::MODER8::Output::Set();
-    GPIOC::MODER::MODER9::Output::Set();
-    
-//*Запись по адресу регистра GPIOC_ODR биты 5,8,9 в 1*
-    
-    GPIOC::ODR::ODR5::Enable::Set();
-    GPIOC::ODR::ODR8::Enable::Set();
-    GPIOC::ODR::ODR9::Enable::Set();
-    
-  Delay();  
-  
- * // Запись битов 5,8,9 в 0*
- 
-    GPIOC::ODR::ODR5::Disable::Set();
-    GPIOC::ODR::ODR8::Disable::Set();
-    GPIOC::ODR::ODR9::Disable::Set();
-  }
-return 0;
-}
-----
-[.blue.backgorund.] 
-В регистрах GPIOС_MODER и GPIOС_ODR происходит запись соответствующих битов согласно кода
+RCC::AHB1ENR::GPIOCEN::Enable::Set() ;
 
-== Задание 2 
-[source,]
+  volatile uint32_t *ModerPointer = reinterpret_cast<volatile uint32_t*>(ModerAddr);
+  for(;;)
+   {
+      *ModerPointer |= ((1 << 10 )|(1<<16)|(1<<18));
+      *ModerPointer &= ~ ((1 << 11 )|(1<<17)|(1<<19));
+   }
 ----
-int __low_level_init (void)
-  {
-    RCC::CR::HSEON::Enable::Set();
-    while (!RCC::CR::HSERDY::Enable::IsSet());
-    {
-    };
-    
-    RCC::CFGR::SW::Hse::Set();
-    while (!RCC::CFGR::SWS::Hse::IsSet());
-    {
-    };
-    RCC::CFGR::RTCPRE::Set(16);
-    RCC::AHB1ENR::GPIOCEN::Enable::Set(); 
-    RCC::AHB1ENR::GPIOAEN::Enable::Set(); 
-    GPIOA::MODER::MODER5::Output::Set(); 
-    GPIOC::MODER::MODER5::Output::Set(); 
-    GPIOC::MODER::MODER8::Output::Set(); 
-    GPIOC::MODER::MODER9::Output::Set(); 
-    GPIOC::MODER::MODER13::Input::Set(); 
-----
+-volatile позволяет при компиляции  данные действия не оптимизировать ядром 
 
-[.blue.backgorund.] 
-Произвели проверку совпадения значения  регистра GPIOC_MODER со значением в переменной типа int
-
-== Задание 3
-[source,]
-----
-RCC::CFGR::SW::Hse::Set();
-    while (!RCC::CFGR::SWS::Hse::IsSet());
-    {
-    };
-    RCC::CFGR::RTCPRE::Set(16);
-    RCC::AHB1ENR::GPIOCEN::Enable::Set(); //podkluchaem porti C
-    RCC::AHB1ENR::GPIOAEN::Enable::Set(); //podkluchaem porti A
-    GPIOA::MODER::MODER5::Output::Set(); //Podkluchaem port kak vihod
-    GPIOC::MODER::MODER5::Output::Set(); //Podkluchaem port kak vihod
-    GPIOC::MODER::MODER8::Output::Set(); //Podkluchaem port kak vihod
-    GPIOC::MODER::MODER9::Output::Set(); //Podkluchaem port kak vihod
-    GPIOC::MODER::MODER13::Input::Set(); //Podkluchaem port kak vhod
-----
-== Задание 4 
-
-Сделать программу, которая при нажатии кнопки UserButton на отладочной плате меняет состояние всех 4 светодидов.
+*Запишем по адресу регистра GPIOC_ODR биты 5,8,9 в 1*
 
 [source,]
 ----
-//Кнопка 
+*OdrPointer |= ((1 << 5 )|(1<<8)|(1<<9))// Запись в регистр ODR битов 5,8,9 в 1
+----
+*Напишем функцию задержки void Delay:*
+[source,]
+----
+void delay(uint32_t delay)
+ {
+   for (int i=0; i<delay; i++)
+   {
+   }
+ }
+ delay (значение)
+----
+
+*запишем по адресу регистра GPIOC_ODR биты 5,8,9 в 0*
+[source,]
+----
+*OdrPointer &= ~ ((1 << 5 )|(1<<8)|(1<<9));Запись в регистр ODR битов 5,8,9 в 0
+----
+[#image-А2]
+.Результат записи в регистр ODR
+image::А2.jpg[] 
+[#ODR_back]
+.Сброс
+image::ODR_back.png[]
+
+
+Ранее мы прописывали значения переменных через указатель по адресу 0x40020800, что можно увидеть здесь (изначально везде было "cd").
+
+[#Changes]
+.Значения переменных через указатель
+image::Changes.png[]
+
+==== Задание 2 
+
+
+*Создать указатель типа volatile int, которая будет содержать адрес регистра GPIOC_MODER*
+
+[source,]
+----
+volatile uint32_t ModerPointer = reinterpret_cast<volatile uint32_t>(0x40020800);
+----
+Создать переменную типа int и записать туда значение, которое содержится по этому адресу
+
+[source,]
+----
+int Moder = ModerPointer
+----
+==== Задание 3
+
+.Данные варианта
+[width="100%",options="header,footer"]
+|====================
+| 8 | PLL |  4 Мгц
+|====================
+
+[#image-AHB]
+.Делители
+image::AHB.png[]
+
+Частота PLL 8 Мгц,необходимо уменьшить частоту в 2 раза
+
+Для этого сначала включим источник
+[source,]
+----
+RCC::CR::PLLON::Value1::Set();
+----
+И дождемся его стабилизации
+[source,]
+----
+while ( !RCC::CR::PLLRDY::Value1::IsSet( ) )
+    {
+    };
+----
+теперь обозначим частоту источника как системную
+[source,]
+----
+RCC::CFGR::SW::Pll::Set();
+----
+И дождемся переключения
+[source,]
+----
+while ( !RCC::CFGR::SWS::Pll::IsSet( ) )
+    {
+    };
+----
+Теперь уменьшим частоту с помощью делителя
+[source,]
+----
+RCC::CFGR::HPRE::Value2::Set()
+----
+
+==== Задание 4 
+[source,]
+----
+//Кнопка
 
 int main()
 {
@@ -154,4 +185,5 @@ return 0;
 // Описание:
 Задается flag,который при нажатии IDR13 (кнопка) из 0 переходит в 1 ==> Кнопка включается после чего загараются четыре светодиода.
 При поторном нажатии происходит обратное действие flag,который при нажатии IDR13 (кнопка) из 1 переходит в 0 ==> Кнопка выключается,гаснут светодиоды.
+
 ----

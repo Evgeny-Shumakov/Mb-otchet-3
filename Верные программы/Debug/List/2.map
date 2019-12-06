@@ -1,0 +1,233 @@
+###############################################################################
+#
+# IAR ELF Linker V8.40.1.212/W32 for ARM                  06/Dec/2019  19:46:52
+# Copyright 2007-2019 IAR Systems AB.
+#
+#    Output file  =  C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Exe\2.out
+#    Map file     =
+#        C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\List\2.map
+#    Command line =
+#        -f C:\Users\User\AppData\Local\Temp\EW211C.tmp
+#        (C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Obj\main.o
+#        C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Obj\startup.o
+#        --no_out_extension -o
+#        C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Exe\2.out --redirect
+#        _Printf=_PrintfFullNoMb --redirect _Scanf=_ScanfFullNoMb --map
+#        C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\List\2.map --config
+#        C:\Users\User\Documents\GitHub\POIP-Hub\22\2_la.icf --semihosting
+#        --entry __iar_program_start --vfe --enable_stack_usage --text_out
+#        locale)
+#
+###############################################################################
+
+*******************************************************************************
+*** MESSAGES
+***
+
+Warning[Ls015]: [stack usage analysis] at least one function appears to be
+          uncalled. Example: "InterruptHandler::DummyHandler()". A complete
+          list of uncalled functions is in the map file.
+
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor        = *
+__CPP_Exceptions = Disabled
+__CPP_Language   = C++14
+__Heap_Handler   = Basic
+__SystemLibrary  = DLib
+__dlib_version   = 6
+
+
+*******************************************************************************
+*** HEAP SELECTION
+***
+
+The basic heap was selected because no calls to memory allocation
+functions were found in the application outside of system library
+functions, and there are calls to deallocation functions in the
+application.
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A0":  place at address 0x800'0000 { ro section .intvec };
+"P1":  place in [from 0x800'0000 to 0x807'ffff] { ro };
+define block CSTACK with size = 32, alignment = 8 { };
+define block HEAP with size = 0, alignment = 8 { };
+"P2":  place in [from 0x2000'0000 to 0x2001'ffff] {
+          rw, block CSTACK, block HEAP };
+
+No sections matched the following patterns:
+
+  rw  in "P2"
+
+
+  Section   Kind         Address  Size  Object
+  -------   ----         -------  ----  ------
+"A0":                             0xbc
+  .intvec   const     0x800'0000  0xbc  startup.o [1]
+                    - 0x800'00bc  0xbc
+
+"P1":                             0xe4
+  .text     ro code   0x800'00bc  0x54  main.o [1]
+  .text     ro code   0x800'0110  0x14  main.o [1]
+  .text     ro code   0x800'0124  0x22  fpinit_M.o [4]
+  .text     ro code   0x800'0146   0x2  startup.o [1]
+  .text     ro code   0x800'0148  0x1e  cmain.o [5]
+  .text     ro code   0x800'0166   0x4  low_level_init.o [2]
+  .text     ro code   0x800'016a   0x4  exit.o [2]
+  .text     ro code   0x800'016e   0x2  startup.o [1]
+  .text     ro code   0x800'0170   0xa  cexit.o [5]
+  .rodata   const     0x800'017a   0x1  unwind_debug.o [6]
+  .text     ro code   0x800'017c  0x14  exit.o [6]
+  .text     ro code   0x800'0190  0x10  startup.o [1]
+                    - 0x800'01a0  0xe4
+
+"P2":                             0x20
+  CSTACK             0x2000'0000  0x20  <Block>
+    CSTACK  uninit   0x2000'0000  0x20  <Block tail>
+                   - 0x2000'0020  0x20
+
+Unused ranges:
+
+         From           To      Size
+         ----           --      ----
+   0x800'01a0   0x807'ffff  0x7'fe60
+  0x2000'0020  0x2001'ffff  0x1'ffe0
+
+
+*******************************************************************************
+*** STACK USAGE
+***
+
+  Call Graph Root Category  Max Use  Total Use
+  ------------------------  -------  ---------
+  Program entry                 24         24
+  Uncalled function              0          0
+
+
+Program entry
+  "__iar_program_start": 0x800'0191
+
+  Maximum call chain                               24  bytes
+
+    "__iar_program_start"                           8
+    "__cmain"                                       0
+    "main"                                         16
+    "void FieldValueBase<RCC_AHBENR_GPIOCEN_Values<RCC::AHB1ENR, (unsigned int)2, (unsigned int)1, ReadWriteMode, RCC::RCCAHB1ENRBase>, RCC::RCCAHB1ENRBase, (unsigned int)1>::Set<ReadWriteMode, void>()"
+                                                    0
+
+Uncalled function
+  "InterruptHandler::DummyHandler()": 0x800'0147
+
+  Maximum call chain                                0  bytes
+
+    "InterruptHandler::DummyHandler()"              0
+
+Uncalled function
+  "InterruptHandler::Timer2Handler()": 0x800'016f
+
+  Maximum call chain                                0  bytes
+
+    "InterruptHandler::Timer2Handler()"             0
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module            ro code  ro data  rw data
+    ------            -------  -------  -------
+command line/config:
+    -------------------------------------------
+    Total:
+
+C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Obj: [1]
+    main.o                104
+    startup.o              20      188
+    -------------------------------------------
+    Total:                124      188
+
+dl7M_tln.a: [2]
+    exit.o                  4
+    low_level_init.o        4
+    -------------------------------------------
+    Total:                  8
+
+dlpp7M_tl_nc.a: [3]
+    -------------------------------------------
+    Total:
+
+m7M_tls.a: [4]
+    fpinit_M.o             34
+    -------------------------------------------
+    Total:                 34
+
+rt7M_tl.a: [5]
+    cexit.o                10
+    cmain.o                30
+    -------------------------------------------
+    Total:                 40
+
+shb_l.a: [6]
+    exit.o                 20
+    unwind_debug.o                   1
+    -------------------------------------------
+    Total:                 20        1
+
+    Gaps                    1
+    Linker created                           32
+-----------------------------------------------
+    Grand Total:          227      189       32
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                       Address  Size  Type      Object
+-----                       -------  ----  ----      ------
+?main                    0x800'0149        Code  Gb  cmain.o [5]
+CSTACK$$Base            0x2000'0000         --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'0020         --   Gb  - Linker created -
+InterruptHandler::DummyHandler()
+                         0x800'0147   0x2  Code  Gb  startup.o [1]
+InterruptHandler::Timer2Handler()
+                         0x800'016f   0x2  Code  Gb  startup.o [1]
+Region$$Table$$Base             0x0         --   Gb  - Linker created -
+Region$$Table$$Limit            0x0         --   Gb  - Linker created -
+__cmain                  0x800'0149        Code  Gb  cmain.o [5]
+__exit                   0x800'017d  0x14  Code  Gb  exit.o [6]
+__iar_debug_exceptions   0x800'017a   0x1  Data  Gb  unwind_debug.o [6]
+__iar_init_vfp           0x800'0125        Code  Gb  fpinit_M.o [4]
+__iar_program_start      0x800'0191  0x10  Code  Gb  startup.o [1]
+__low_level_init         0x800'0167   0x4  Code  Gb  low_level_init.o [2]
+__vector_table           0x800'0000  0xbc  Data  Lc  startup.o [1]
+_call_main               0x800'0155        Code  Gb  cmain.o [5]
+_exit                    0x800'0171        Code  Gb  cexit.o [5]
+_main                    0x800'0163        Code  Gb  cmain.o [5]
+delay(unsigned int)      0x800'00bd   0xc  Code  Gb  main.o [1]
+exit                     0x800'016b   0x4  Code  Gb  exit.o [2]
+main                     0x800'00c9  0x36  Code  Gb  main.o [1]
+void FieldValueBase<RCC_AHBENR_GPIOCEN_Values<RCC::AHB1ENR, (unsigned int)2, (unsigned int)1, ReadWriteMode, RCC::RCCAHB1ENRBase>, RCC::RCCAHB1ENRBase, (unsigned int)1>::Set<ReadWriteMode, void>()
+                         0x800'0111  0x14  Code  Gb  main.o [1]
+
+
+[1] = C:\Users\User\Documents\GitHub\POIP-Hub\22\Debug\Obj
+[2] = dl7M_tln.a
+[3] = dlpp7M_tl_nc.a
+[4] = m7M_tls.a
+[5] = rt7M_tl.a
+[6] = shb_l.a
+
+  227 bytes of readonly  code memory
+  189 bytes of readonly  data memory
+   32 bytes of readwrite data memory
+
+Errors: none
+Warnings: 1
